@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EcoConnect</title>
+<style>
+:root{
+  --forest:#173C32; --forest-2:#215843; --sage:#7FA684; --sand:#F3F0E6; --card:#FFFFFF;
+  --ink:#182420; --sub:#5B6B62; --gold:#C9A24B; --line:#E4E0D2; --radius:14px;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root:not([data-theme="light"]){}
+:root[data-theme="dark"]{
+  --forest:#0E2A22; --sand:#101613; --card:#182420; --ink:#EAF0EA; --sub:#9FB0A6; --line:#2B342F;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--sand);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100%}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif;margin:0 0 6px;line-height:1.15}
+button{font-family:inherit;cursor:pointer;border:none}
+a{color:inherit;text-decoration:none}
+.container{max-width:1180px;margin:0 auto;padding:0 16px}
+.btn{padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--forest);color:#fff}
+.btn-gold{background:var(--gold);color:#20180a}
+.btn-outline{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:999px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.hide{display:none!important}
+.pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;background:var(--sage);color:#0e1f16;font-weight:600}
+
+/* ===== TOP NAV ===== */
+#topnav{position:sticky;top:0;z-index:40;background:var(--forest);color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 0 10px}
+#topnav .row{display:flex;align-items:center;gap:16px}
+.logo{font-family:Georgia,serif;font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.navlinks{display:flex;gap:18px;flex:1;font-size:14px}
+.navlinks a{opacity:.85;padding:6px 2px;border-bottom:2px solid transparent}
+.navlinks a.active{opacity:1;border-color:var(--gold)}
+#search-box{flex:1;max-width:280px}
+#search-box input{width:100%;padding:8px 12px;border-radius:999px;border:none;background:rgba(255,255,255,.14);color:#fff}
+#search-box input::placeholder{color:#cfe0d6}
+.icon-btn{background:transparent;color:#fff;font-size:18px;padding:6px}
+@media(max-width:860px){.navlinks{display:none}}
+
+/* ===== LANDING ===== */
+.hero{padding:70px 0 50px;text-align:left}
+.hero h1{font-size:44px;max-width:640px}
+.hero p{color:var(--sub);max-width:520px;font-size:17px;margin-bottom:22px}
+.hero .actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:36px 0}
+.stats .card{text-align:center}
+.stats .num{font-size:26px;font-weight:700;font-family:Georgia,serif;color:var(--forest-2)}
+:root[data-theme="dark"] .stats .num{color:var(--sage)}
+.stats .lbl{font-size:12px;color:var(--sub)}
+.issuegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr)}.issuegrid{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:32px}}
+.issue-icon{width:44px;height:44px;border-radius:12px;background:var(--sage);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px}
+
+/* ===== APP SHELL ===== */
+#app-shell{display:none}
+#app-shell.on{display:block}
+.shell-grid{display:grid;grid-template-columns:220px 1fr 280px;gap:18px;padding-top:18px;align-items:start}
+@media(max-width:1024px){.shell-grid{grid-template-columns:1fr 280px}#sidebar{display:none}}
+@media(max-width:760px){.shell-grid{grid-template-columns:1fr}#rightbar{display:none}}
+#sidebar,#rightbar{position:sticky;top:70px}
+#sidebar .item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:600;margin-bottom:2px}
+#sidebar .item.active,#sidebar .item:hover{background:var(--card)}
+.center-col>*{margin-bottom:16px}
+
+/* composer */
+.composer textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;resize:vertical;min-height:60px;background:transparent;color:var(--ink)}
+.composer-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.composer select,.composer input[type=text]{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px}
+
+/* post */
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;font-weight:700;color:#0e1f16;flex-shrink:0}
+.post-meta .name{font-weight:700;font-size:14px}
+.post-meta .time{font-size:12px;color:var(--sub)}
+.post-img{margin-top:10px;border-radius:10px;height:160px;display:flex;align-items:center;justify-content:center;font-size:40px}
+.post-actions{display:flex;gap:6px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.pa-btn{flex:1;background:transparent;padding:8px;border-radius:8px;font-size:13px;color:var(--sub);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.pa-btn:hover{background:var(--sand)}
+.pa-btn.on{color:var(--forest-2)}
+:root[data-theme="dark"] .pa-btn.on{color:var(--sage)}
+.comments{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-size:13px}
+.comment{display:flex;gap:8px;margin-bottom:8px}
+.comment-body{background:var(--sand);padding:6px 10px;border-radius:10px;flex:1}
+.comment-form{display:flex;gap:6px;margin-top:6px}
+.comment-form input{flex:1;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+
+/* right/side lists */
+.mini-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.mini-row:last-child{border:none}
+
+/* campaigns */
+.camp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:600px){.camp-grid{grid-template-columns:1fr}}
+.camp-img{height:90px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:8px}
+.progress{height:8px;border-radius:999px;background:var(--sand);overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:var(--gold)}
+
+/* community */
+.group-card{display:flex;justify-content:space-between;align-items:center}
+.thread{border-top:1px solid var(--line);padding-top:8px;margin-top:8px;font-size:13px}
+
+/* profile */
+.profile-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.profile-head .avatar{width:70px;height:70px;font-size:26px}
+.profile-stats{display:flex;gap:22px;margin-top:10px;font-size:13px}
+.profile-stats b{display:block;font-size:16px}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(10,20,15,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal-bg.on{display:flex}
+.modal{background:var(--card);border-radius:16px;padding:24px;max-width:380px;width:100%}
+.modal input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);margin-bottom:10px;background:transparent;color:var(--ink)}
+.modal label{font-size:12px;color:var(--sub)}
+
+/* notifications panel */
+.notif-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.notif-item:last-child{border:none}
+
+/* bottom nav mobile */
+#bottomnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));z-index:40}
+#bottomnav.on{display:flex}
+#bottomnav .bn-item{flex:1;text-align:center;font-size:20px;color:var(--sub)}
+#bottomnav .bn-item.active{color:var(--forest-2)}
+:root[data-theme="dark"] #bottomnav .bn-item.active{color:var(--sage)}
+@media(max-width:760px){body{padding-bottom:56px}}
+
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.empty{text-align:center;padding:30px;color:var(--sub);font-size:14px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+
+<div id="topnav">
+  <div class="container row">
+    <div class="logo">🌿 EcoConnect</div>
+    <div class="navlinks" id="navlinks">
+      <a data-go="landing">Home</a><a data-go="explore">Explore</a><a data-go="campaigns">Campaigns</a><a data-go="community">Community</a><a data-go="about">About</a>
+    </div>
+    <div id="search-box" class="hide"><input id="search-input" placeholder="Search EcoConnect..." oninput="app.doSearch(this.value)"></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="icon-btn" onclick="app.toggleTheme()" title="Toggle theme">🌓</button>
+      <button class="icon-btn" onclick="app.openMore()" title="More pages">☰</button>
+      <button class="icon-btn hide" id="notif-btn" onclick="app.go('notifications')">🔔<span id="notif-dot" style="color:var(--gold)"></span></button>
+      <button class="btn btn-outline btn-sm hide" id="profile-btn" onclick="app.go('profile')">Profile</button>
+      <button class="btn btn-gold btn-sm" id="login-nav-btn" onclick="app.openAuth()">Join EcoConnect</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div id="view-landing">
+  <div class="container hero">
+    <h1>Connect. Share. Act for Our Planet.</h1>
+    <p>EcoConnect brings students, citizens, and organizations together to talk about the environmental issues around them, run local campaigns, and turn awareness into action.</p>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="app.openAuth()">Join EcoConnect</button>
+      <button class="btn btn-outline" onclick="app.go('explore')">Explore Issues</button>
+    </div>
+    <div class="stats">
+      <div class="card"><div class="num" id="stat-members">2,438</div><div class="lbl">Active Members</div></div>
+      <div class="card"><div class="num" id="stat-posts">1,206</div><div class="lbl">Environmental Posts</div></div>
+      <div class="card"><div class="num" id="stat-camps">6</div><div class="lbl">Campaigns</div></div>
+      <div class="card"><div class="num" id="stat-trees">18,940</div><div class="lbl">Actions Supported</div></div>
+    </div>
+    <div class="section-title"><h3>Explore issues people are talking about</h3></div>
+    <div class="issuegrid" id="landing-issues"></div>
+  </div>
+</div>
+
+<!-- PUBLIC PAGES (no login required) -->
+<div id="view-public" class="hide"><div class="container" id="public-content" style="padding:40px 0;max-width:760px"></div></div>
+
+<!-- MORE MENU -->
+<div class="modal-bg" id="more-modal">
+  <div class="modal">
+    <h3>More on EcoConnect</h3>
+    <div id="more-links"></div>
+    <p style="text-align:center;font-size:12px;margin-top:12px"><a href="#" onclick="app.closeMore(event)" style="color:var(--sub)">Close</a></p>
+  </div>
+</div>
+
+<!-- APP SHELL (post-login) -->
+<div id="app-shell">
+  <div class="container shell-grid">
+    <div id="sidebar">
+      <div class="card" style="padding:10px">
+        <div class="item" data-go="home">🏠 Home</div>
+        <div class="item" data-go="explore">🌍 Explore</div>
+        <div class="item" data-go="campaigns">📢 Campaigns</div>
+        <div class="item" data-go="community">💬 Community</div>
+        <div class="item" data-go="profile">👤 Profile</div>
+        <div class="item" data-go="notifications">🔔 Notifications</div>
+        <div class="item" data-go="about">ℹ️ About</div>
+      </div>
+    </div>
+
+    <div class="center-col" id="center-col">
+      <!-- injected per view -->
+    </div>
+
+    <div id="rightbar">
+      <div class="card">
+        <div class="section-title"><h3 style="font-size:15px">Trending Issues</h3></div>
+        <div id="trend-issues"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="section-title"><h3 style="font-size:15px">Campaigns</h3></div>
+        <div id="trend-camps"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="section-title"><h3 style="font-size:15px">Suggested Users</h3></div>
+        <div id="trend-users"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bottomnav">
+  <div class="bn-item" data-go="home">🏠</div>
+  <div class="bn-item" data-go="explore">🌍</div>
+  <div class="bn-item" data-go="campaigns">📢</div>
+  <div class="bn-item" data-go="community">💬</div>
+  <div class="bn-item" data-go="profile">👤</div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-bg" id="auth-modal">
+  <div class="modal">
+    <h3 id="auth-title">Log in to EcoConnect</h3>
+    <div id="auth-signup-fields">
+      <label>Name</label><input id="auth-name" placeholder="Your name">
+    </div>
+    <label>Email</label><input id="auth-email" placeholder="you@example.com">
+    <label>Password</label><input id="auth-pass" type="password" placeholder="••••••••">
+    <button class="btn btn-primary" style="width:100%;margin-top:6px" onclick="app.submitAuth()">Continue</button>
+    <p style="text-align:center;font-size:13px;margin-top:10px;color:var(--sub)">
+      <a href="#" onclick="app.toggleAuthMode(event)" id="auth-toggle-link">New here? Create an account</a>
+    </p>
+    <p style="text-align:center;font-size:12px"><a href="#" onclick="app.closeAuth(event)" style="color:var(--sub)">Cancel</a></p>
+  </div>
+</div>
+
+<script>
+/* ================= EcoConnect mock app =================
+   All state lives in localStorage under "ecoconnect_state".
+   This is a self-contained prototype: no backend required. */
+
+const ISSUES = [
+ {id:'air',icon:'💨',title:'Air Pollution',desc:'Harmful particles and gases released by vehicles, factories, and burning affect the air we breathe every day.',causes:'Vehicle emissions, industrial smoke, crop burning.',effects:'Respiratory disease, smog, reduced visibility.',solutions:'Public transport, cleaner fuels, tree planting.'},
+ {id:'water',icon:'💧',title:'Water Pollution',desc:'Rivers and lakes are contaminated by industrial waste, sewage, and plastic, threatening drinking water supplies.',causes:'Industrial discharge, sewage, agricultural runoff.',effects:'Waterborne disease, dying aquatic life.',solutions:'Waste treatment, community river clean-ups.'},
+ {id:'plastic',icon:'🧴',title:'Plastic Pollution',desc:'Single-use plastic waste piles up in landfills and oceans, taking centuries to break down.',causes:'Single-use packaging, poor waste segregation.',effects:'Marine life harm, soil contamination.',solutions:'Reusables, recycling drives, plastic bans.'},
+ {id:'deforest',icon:'🌲',title:'Deforestation',desc:'Forests are cleared for agriculture and development, reducing habitats and carbon storage.',causes:'Logging, agriculture expansion, urbanization.',effects:'Habitat loss, soil erosion, more CO2.',solutions:'Reforestation drives, sustainable sourcing.'},
+ {id:'climate',icon:'🌡️',title:'Climate Change',desc:'Long-term shifts in temperature and weather patterns driven mainly by human activity.',causes:'Greenhouse gas emissions, deforestation.',effects:'Extreme weather, rising sea levels.',solutions:'Renewable energy, lower emissions, policy action.'},
+ {id:'warming',icon:'🔥',title:'Global Warming',desc:'The steady rise in Earth\'s average temperature, mainly from burning fossil fuels.',causes:'CO2 and methane emissions.',effects:'Melting ice caps, heatwaves.',solutions:'Clean energy, energy efficiency.'},
+ {id:'waste',icon:'🗑️',title:'Waste Management',desc:'Poor disposal of household and industrial waste pollutes land, air, and water.',causes:'Lack of segregation, illegal dumping.',effects:'Landfill overflow, toxic leaching.',solutions:'Composting, recycling programs, segregation.'},
+ {id:'bio',icon:'🦋',title:'Biodiversity',desc:'The variety of life on Earth is shrinking as habitats are destroyed and species disappear.',causes:'Habitat loss, pollution, poaching.',effects:'Species extinction, ecosystem collapse.',solutions:'Protected reserves, habitat restoration.'}
+];
+
+const SEED_USERS = [
+ {id:'u1',name:'Aarav Sharma',bio:'Environmental Student · turning classroom ideas into local action.',tag:'Environmental Student',followers:412,following:180},
+ {id:'u2',name:'Priya Patil',bio:'Climate Activist · organizing river clean-ups since 2021.',tag:'Climate Activist',followers:930,following:210},
+ {id:'u3',name:'Rahul Joshi',bio:'Green Technology Enthusiast · building solar for schools.',tag:'Green Tech Enthusiast',followers:601,following:150},
+ {id:'u4',name:'Ananya Deshmukh',bio:'Wildlife Volunteer · rescue and rehabilitation.',tag:'Wildlife Volunteer',followers:775,following:190}
+];
+
+const SEED_POSTS = [
+ {id:'p1',uid:'u2',text:'Cleaned up 40kg of plastic waste from the riverside today with 12 volunteers. Every bag counts! #PlasticPollution #CleanRivers',cat:'Plastic Pollution',icon:'🧴',likes:64,comments:[{uid:'u1',text:'Amazing work, count me in next time!'}]},
+ {id:'p2',uid:'u3',text:'Our college installed 20 solar panels this month, cutting diesel generator use by half. Green tech really works. #ClimateChange',cat:'Climate Change',icon:'🌡️',likes:88,comments:[]},
+ {id:'p3',uid:'u1',text:'AQI hit 310 in our city today. Sharing a thread on simple ways to reduce your exposure indoors. #AirPollution',cat:'Air Pollution',icon:'💨',likes:41,comments:[{uid:'u4',text:'Wearing a mask outdoors really does help.'}]},
+ {id:'p4',uid:'u4',text:'Rescued a barn owl trapped in illegal netting near the forest edge. Habitat loss is pushing wildlife into farmland. #Biodiversity #Deforestation',cat:'Deforestation',icon:'🌲',likes:120,comments:[]},
+ {id:'p5',uid:'u2',text:'Started composting at home — cut our household waste going to landfill by 60% in two months. #WasteManagement',cat:'Waste Management',icon:'🗑️',likes:57,comments:[]},
+ {id:'p6',uid:'u3',text:'Rainwater harvesting saved our campus 30,000L of water this monsoon. Small setups, big impact. #WaterConservation',cat:'Water Pollution',icon:'💧',likes:73,comments:[]}
+];
+
+const SEED_CAMPAIGNS = [
+ {id:'c1',icon:'🧴',title:'Say No to Plastic',desc:'Pledge to cut single-use plastic from your daily routine.',participants:842,goal:1500},
+ {id:'c2',icon:'🧹',title:'Clean Your Local Area',desc:'Join a neighbourhood clean-up drive this weekend.',participants:530,goal:1000},
+ {id:'c3',icon:'🌱',title:'Plant a Tree',desc:'Commit to planting and caring for one tree this season.',participants:1290,goal:2000},
+ {id:'c4',icon:'💧',title:'Save Water',desc:'Adopt simple habits at home to cut water waste.',participants:610,goal:1200},
+ {id:'c5',icon:'🏞️',title:'Clean Rivers',desc:'Volunteer for riverside plastic and debris removal.',participants:355,goal:900},
+ {id:'c6',icon:'🔌',title:'Reduce E-Waste',desc:'Recycle old electronics responsibly instead of binning them.',participants:214,goal:800}
+];
+
+const GROUPS = [
+ {id:'g1',icon:'🌡️',title:'Climate Action',members:1204,threads:[{user:'Priya Patil',text:'What local policy changes have actually worked in your city?'}]},
+ {id:'g2',icon:'💡',title:'Green Technology',members:860,threads:[{user:'Rahul Joshi',text:'Anyone tried micro wind turbines for small campuses?'}]},
+ {id:'g3',icon:'🌿',title:'Sustainable Living',members:1540,threads:[{user:'Aarav Sharma',text:'Sharing my zero-waste kitchen swaps that actually stuck.'}]},
+ {id:'g4',icon:'🎓',title:'College Eco Clubs',members:690,threads:[{user:'Ananya Deshmukh',text:'How does your club run its tree-planting drives?'}]},
+ {id:'g5',icon:'🦉',title:'Wildlife Protection',members:512,threads:[{user:'Ananya Deshmukh',text:'Reporting illegal snares near the forest boundary — who do I contact?'}]},
+ {id:'g6',icon:'🗑️',title:'Waste Management',members:433,threads:[{user:'Priya Patil',text:'Best composting setup for a small apartment balcony?'}]}
+];
+
+const NEWS = [
+ {icon:'📰',date:'Sep 20, 2026',title:'City Announces New Recycling Centers in 12 Wards',excerpt:'The municipal corporation will open drop-off points for e-waste and plastic starting next month, aiming to cut landfill volume by a third.'},
+ {icon:'🌊',date:'Sep 14, 2026',title:'River Clean-Up Drive Removes 3 Tonnes of Waste',excerpt:'Over 500 EcoConnect volunteers joined the weekend clean-up along the riverside, the largest turnout the drive has seen.'},
+ {icon:'🌳',date:'Sep 5, 2026',title:'Community Tree-Planting Crosses 20,000 Sapling Mark',excerpt:'The Plant a Tree campaign hit a major milestone this week with help from local colleges and eco clubs.'},
+ {icon:'☀️',date:'Aug 29, 2026',title:'Solar Subsidy Scheme Extended for Households',excerpt:'A new policy update makes rooftop solar more affordable for residential buildings across the state.'}
+];
+const EVENTS = [
+ {icon:'🧹',title:'Riverside Clean-Up Drive',date:'Oct 4, 2026 · 7:00 AM',loc:'Riverside Park, Gate 2',desc:'Bring gloves and reusable bags — breakfast is provided for all volunteers.'},
+ {icon:'🌱',title:'Community Tree Plantation',date:'Oct 11, 2026 · 8:00 AM',loc:'City Nursery Grounds',desc:'Saplings and tools provided. Open to all ages, families welcome.'},
+ {icon:'🎤',title:'Climate Action Town Hall',date:'Oct 18, 2026 · 5:00 PM',loc:'EcoConnect Community Hall',desc:'Panel discussion with local environmentalists, students, and policymakers.'},
+ {icon:'♻️',title:'E-Waste Collection Camp',date:'Oct 25, 2026 · 10:00 AM',loc:'Central Market Square',desc:'Drop off old electronics and batteries for responsible recycling.'}
+];
+const FAQS = [
+ {q:'Is EcoConnect free to join?',a:'Yes, creating an account and using every feature on EcoConnect is completely free.'},
+ {q:'How do I start my own campaign?',a:'Reach out through the Contact page with your idea — our team helps set up and promote community-led campaigns.'},
+ {q:'Can organizations create an account?',a:'Yes, environmental organizations can sign up the same way individuals do and share updates with the community.'},
+ {q:'How is my data used?',a:"This prototype stores your activity only in your browser's local storage — nothing is sent to a server."}
+];
+function load(){
+  let s = localStorage.getItem('ecoconnect_state');
+  if(s) return JSON.parse(s);
+  return {
+    user:null, theme:'light',
+    posts: SEED_POSTS.map(p=>({...p, likedByMe:false, savedByMe:false})),
+    campaigns: SEED_CAMPAIGNS.map(c=>({...c, joined:false})),
+    groups: JSON.parse(JSON.stringify(GROUPS)),
+    following:{}, notifications:[
+      {icon:'💚',text:'Priya Patil liked your post'},
+      {icon:'💬',text:'Rahul Joshi commented on your post'},
+      {icon:'➕',text:'Ananya Deshmukh followed you'},
+      {icon:'📢',text:'Campaign "Plant a Tree" reached 1,290 participants'},
+      {icon:'🌍',text:'New discussion started in Climate Action'}
+    ]
+  };
+}
+function save(){ localStorage.setItem('ecoconnect_state', JSON.stringify(state)); }
+let state = load();
+document.documentElement.setAttribute('data-theme', state.theme);
+
+function userById(id){ return SEED_USERS.find(u=>u.id===id) || {id,name:'You',bio:'',tag:'Eco member',followers:0,following:0}; }
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join(''); }
+function timeAgo(i){ const h=[3,7,1,20,5,11][i%6]; return h<24? h+'h ago' : Math.round(h/24)+'d ago'; }
+
+const PUBLIC_VIEWS = ['about','news','events','getinvolved','contact'];
+const app = {
+  currentView:'landing',
+  go(view, arg){
+    this.currentView = view; this.arg = arg;
+    document.querySelectorAll('#navlinks a,#sidebar .item,#bottomnav .bn-item').forEach(el=>{
+      el.classList.toggle('active', el.dataset.go===view);
+    });
+    const landing=document.getElementById('view-landing'), pub=document.getElementById('view-public'), shell=document.getElementById('app-shell');
+    landing.classList.add('hide'); pub.classList.add('hide'); shell.classList.remove('on');
+    if(view==='landing'){ landing.classList.remove('hide'); window.scrollTo(0,0); return; }
+    if(PUBLIC_VIEWS.includes(view)){
+      pub.classList.remove('hide');
+      document.getElementById('public-content').innerHTML = this.renderPublic(view);
+      window.scrollTo(0,0); this.bindDynamic(); return;
+    }
+    if(!state.user){ this.openAuth(); return; }
+    shell.classList.add('on');
+    this.renderCenter(view, arg);
+    window.scrollTo(0,0);
+  },
+  renderPublic(view){
+    if(view==='about') return this.viewAbout();
+    if(view==='news') return this.viewNews();
+    if(view==='events') return this.viewEvents();
+    if(view==='getinvolved') return this.viewGetInvolved();
+    if(view==='contact') return this.viewContact();
+  },
+  openMore(){
+    document.getElementById('more-links').innerHTML = [
+      ['about','ℹ️ About'],['news','📰 News'],['events','📅 Events'],
+      ['getinvolved','🤝 Get Involved'],['contact','✉️ Contact']
+    ].map(([v,l])=>`<div class="mini-row" style="cursor:pointer" onclick="app.closeMore();app.go('${v}')">${l}</div>`).join('');
+    document.getElementById('more-modal').classList.add('on');
+  },
+  closeMore(e){ if(e) e.preventDefault(); document.getElementById('more-modal').classList.remove('on'); },
+  renderCenter(view, arg){
+    const c = document.getElementById('center-col');
+    if(view==='home') c.innerHTML = this.viewHome();
+    else if(view==='explore') c.innerHTML = arg ? this.viewIssueDetail(arg) : this.viewExplore();
+    else if(view==='campaigns') c.innerHTML = this.viewCampaigns();
+    else if(view==='community') c.innerHTML = arg ? this.viewGroup(arg) : this.viewCommunity();
+    else if(view==='profile') c.innerHTML = this.viewProfile();
+    else if(view==='notifications') c.innerHTML = this.viewNotifications();
+    else if(view==='about') c.innerHTML = document.getElementById('view-about').innerHTML;
+    else if(view==='search') c.innerHTML = this.viewSearch(this.searchTerm||'');
+    this.bindDynamic();
+  },
+  bindDynamic(){
+    document.querySelectorAll('[data-issue]').forEach(el=>el.onclick=()=>this.go('explore', el.dataset.issue));
+    document.querySelectorAll('[data-group]').forEach(el=>el.onclick=()=>this.go('community', el.dataset.group));
+  },
+
+  /* ---------- AUTH ---------- */
+  authMode:'login',
+  openAuth(){ document.getElementById('auth-modal').classList.add('on'); },
+  closeAuth(e){ if(e) e.preventDefault(); document.getElementById('auth-modal').classList.remove('on'); },
+  toggleAuthMode(e){ e.preventDefault(); this.authMode = this.authMode==='login'?'signup':'login';
+    document.getElementById('auth-title').textContent = this.authMode==='login'?'Log in to EcoConnect':'Create your account';
+    document.getElementById('auth-signup-fields').style.display = this.authMode==='signup'?'block':'none';
+    document.getElementById('auth-toggle-link').textContent = this.authMode==='login'?'New here? Create an account':'Already a member? Log in';
+  },
+  submitAuth(){
+    const name = document.getElementById('auth-name').value.trim() || 'You';
+    const email = document.getElementById('auth-email').value.trim();
+    if(!email){ alert('Please enter an email to continue.'); return; }
+    state.user = {id:'me', name, email, bio:'Just joined EcoConnect — excited to help our planet.', tag:'Eco member', followers:12, following:8, joinedCampaigns:[]};
+    save(); this.closeAuth();
+    document.getElementById('search-box').classList.remove('hide');
+    document.getElementById('notif-btn').classList.remove('hide');
+    document.getElementById('profile-btn').classList.remove('hide');
+    document.getElementById('login-nav-btn').classList.add('hide');
+    document.getElementById('bottomnav').classList.add('on');
+    this.go('home');
+  },
+  logout(){ state.user=null; save(); location.reload(); },
+
+  toggleTheme(){
+    state.theme = state.theme==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme', state.theme);
+    save();
+  },
+
+  /* ---------- HOME / FEED ---------- */
+  viewHome(){
+    return `
+    <div class="card composer">
+      <div style="display:flex;gap:10px">
+        <div class="avatar">${initials(state.user.name)}</div>
+        <textarea id="post-text" placeholder="Share an environmental issue or update..."></textarea>
+      </div>
+      <div class="composer-row">
+        <select id="post-cat">
+          <option>Plastic Pollution</option><option>Air Pollution</option><option>Water Pollution</option>
+          <option>Deforestation</option><option>Climate Change</option><option>Waste Management</option>
+        </select>
+        <input type="text" id="post-tags" placeholder="#hashtags">
+        <span style="font-size:12px;color:var(--sub)">📷 image auto-added from category</span>
+        <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="app.createPost()">Post</button>
+      </div>
+    </div>
+    <div class="section-title"><h3>Your Feed</h3></div>
+    <div id="feed-list">${state.posts.map((p,i)=>this.renderPost(p,i)).join('')}</div>`;
+  },
+  createPost(){
+    const text = document.getElementById('post-text').value.trim();
+    if(!text){ alert('Write something before posting.'); return; }
+    const cat = document.getElementById('post-cat').value;
+    const iconMap={'Plastic Pollution':'🧴','Air Pollution':'💨','Water Pollution':'💧','Deforestation':'🌲','Climate Change':'🌡️','Waste Management':'🗑️'};
+    const tags = document.getElementById('post-tags').value.trim();
+    state.posts.unshift({id:'p'+Date.now(), uid:'me', text: text + (tags?(' '+tags):''), cat, icon:iconMap[cat], likes:0, comments:[], likedByMe:false, savedByMe:false});
+    save(); this.renderCenter('home');
+  },
+  renderPost(p,i){
+    const u = p.uid==='me' ? state.user : userById(p.uid);
+    return `<div class="card" data-post="${p.id}">
+      <div class="post-head">
+        <div class="avatar">${initials(u.name)}</div>
+        <div class="post-meta"><div class="name">${u.name}</div><div class="time">${timeAgo(i)} · <span class="pill">${p.cat}</span></div></div>
+        ${p.uid==='me'?`<button class="btn-sm btn-outline btn" style="margin-left:auto" onclick="app.deletePost('${p.id}')">Delete</button>`:''}
+      </div>
+      <div>${p.text}</div>
+      <div class="post-img" style="background:linear-gradient(135deg,var(--sage),var(--forest-2))">${p.icon}</div>
+      <div class="post-actions">
+        <button class="pa-btn ${p.likedByMe?'on':''}" onclick="app.likePost('${p.id}')">👍 ${p.likes}</button>
+        <button class="pa-btn" onclick="app.toggleComments('${p.id}')">💬 ${p.comments.length}</button>
+        <button class="pa-btn" onclick="app.sharePost()">🔁 Share</button>
+        <button class="pa-btn ${p.savedByMe?'on':''}" onclick="app.savePost('${p.id}')">🔖 ${p.savedByMe?'Saved':'Save'}</button>
+      </div>
+      <div class="comments hide" id="comments-${p.id}">
+        ${p.comments.map(c=>`<div class="comment"><div class="avatar" style="width:26px;height:26px;font-size:11px">${initials(userById(c.uid).name)}</div><div class="comment-body"><b>${userById(c.uid).name}</b> ${c.text}</div></div>`).join('') || '<div class="empty">No comments yet — be the first.</div>'}
+        <div class="comment-form"><input id="cinput-${p.id}" placeholder="Write a comment..."><button class="btn btn-sm btn-primary" onclick="app.addComment('${p.id}')">Send</button></div>
+      </div>
+    </div>`;
+  },
+  findPost(id){ return state.posts.find(p=>p.id===id); },
+  likePost(id){ const p=this.findPost(id); p.likedByMe=!p.likedByMe; p.likes += p.likedByMe?1:-1; save(); this.renderCenter('home'); },
+  savePost(id){ const p=this.findPost(id); p.savedByMe=!p.savedByMe; save(); this.renderCenter('home'); },
+  deletePost(id){ state.posts = state.posts.filter(p=>p.id!==id); save(); this.renderCenter('home'); },
+  sharePost(){ alert('Post shared to your followers\' feeds.'); },
+  toggleComments(id){ document.getElementById('comments-'+id).classList.toggle('hide'); },
+  addComment(id){ const inp=document.getElementById('cinput-'+id); const text=inp.value.trim(); if(!text) return;
+    this.findPost(id).comments.push({uid:'me', text}); save(); this.renderCenter('home');
+    setTimeout(()=>document.getElementById('comments-'+id).classList.remove('hide'),0); },
+
+  /* ---------- EXPLORE ---------- */
+  viewExplore(){
+    return `<div class="section-title"><h3>Explore Environmental Issues</h3></div>
+    <div class="issuegrid">${ISSUES.map(i=>`
+      <div class="card" data-issue="${i.id}" style="cursor:pointer">
+        <div class="issue-icon">${i.icon}</div><h3 style="font-size:15px">${i.title}</h3>
+        <p style="font-size:12px;color:var(--sub);margin:0">${i.desc.slice(0,60)}...</p>
+      </div>`).join('')}</div>`;
+  },
+  viewIssueDetail(id){
+    const i = ISSUES.find(x=>x.id===id);
+    const related = state.posts.filter(p=>p.cat.toLowerCase().includes(i.title.split(' ')[0].toLowerCase())).slice(0,3);
+    return `<button class="btn btn-outline btn-sm" onclick="app.go('explore')">← Back</button>
+    <div class="card" style="margin-top:12px">
+      <div class="issue-icon" style="font-size:30px;width:60px;height:60px">${i.icon}</div>
+      <h2>${i.title}</h2><p style="color:var(--sub)">${i.desc}</p>
+      <p><b>Causes:</b> ${i.causes}</p><p><b>Effects:</b> ${i.effects}</p><p><b>Solutions:</b> ${i.solutions}</p>
+      <button class="btn btn-primary btn-sm" onclick="app.go('community','g1')">Join Discussion</button>
+    </div>
+    <div class="section-title" style="margin-top:16px"><h3>Related Posts</h3></div>
+    ${related.length ? related.map((p,idx)=>this.renderPost(p,idx)).join('') : '<div class="card empty">No related posts yet.</div>'}`;
+  },
+
+  /* ---------- CAMPAIGNS ---------- */
+  viewCampaigns(){
+    return `<div class="section-title"><h3>Environmental Campaigns</h3></div>
+    <div class="camp-grid">${state.campaigns.map(c=>`
+      <div class="card">
+        <div class="camp-img" style="background:linear-gradient(135deg,var(--sage),var(--forest-2))">${c.icon}</div>
+        <h3 style="font-size:15px">${c.title}</h3><p style="font-size:13px;color:var(--sub)">${c.desc}</p>
+        <div style="font-size:12px;color:var(--sub)">${c.participants.toLocaleString()} participants</div>
+        <div class="progress"><div class="progress-fill" style="width:${Math.min(100,c.participants/c.goal*100)}%"></div></div>
+        <button class="btn btn-sm ${c.joined?'btn-outline':'btn-primary'}" style="width:100%" onclick="app.joinCampaign('${c.id}')">${c.joined?'✓ Joined':'Join Campaign'}</button>
+      </div>`).join('')}</div>`;
+  },
+  joinCampaign(id){
+    const c = state.campaigns.find(x=>x.id===id);
+    c.joined = !c.joined; c.participants += c.joined?1:-1;
+    save(); this.renderCenter('campaigns'); this.renderRight();
+  },
+
+  /* ---------- COMMUNITY ---------- */
+  viewCommunity(){
+    return `<div class="section-title"><h3>Community & Discussion</h3></div>
+    ${state.groups.map(g=>`<div class="card group-card" data-group="${g.id}" style="cursor:pointer;margin-bottom:12px">
+      <div style="display:flex;gap:10px;align-items:center"><div class="issue-icon" style="margin:0">${g.icon}</div>
+      <div><b>${g.title}</b><div style="font-size:12px;color:var(--sub)">${g.members.toLocaleString()} members</div></div></div>
+      <span class="pill">${g.threads.length} threads</span></div>`).join('')}`;
+  },
+  viewGroup(id){
+    const g = state.groups.find(x=>x.id===id);
+    return `<button class="btn btn-outline btn-sm" onclick="app.go('community')">← Back</button>
+    <div class="card" style="margin-top:12px">
+      <h2>${g.icon} ${g.title}</h2><p style="color:var(--sub);font-size:13px">${g.members.toLocaleString()} members discussing ${g.title.toLowerCase()}.</p>
+      <div class="comment-form"><input id="new-thread" placeholder="Start a new discussion..."><button class="btn btn-sm btn-primary" onclick="app.addThread('${g.id}')">Post</button></div>
+      <div id="threads">${g.threads.map(t=>`<div class="thread"><b>${t.user}</b><div>${t.text}</div></div>`).join('')}</div>
+    </div>`;
+  },
+  addThread(id){
+    const inp=document.getElementById('new-thread'); const text=inp.value.trim(); if(!text) return;
+    state.groups.find(g=>g.id===id).threads.unshift({user:state.user.name, text});
+    save(); this.renderCenter('community', id);
+  },
+
+  /* ---------- PROFILE ---------- */
+  viewProfile(){
+    const u = state.user;
+    const myPosts = state.posts.filter(p=>p.uid==='me');
+    return `<div class="card profile-head">
+      <div class="avatar">${initials(u.name)}</div>
+      <div style="flex:1;min-width:200px">
+        <h2 style="margin-bottom:2px">${u.name}</h2><span class="pill">${u.tag}</span>
+        <p style="color:var(--sub);font-size:13px;margin:8px 0 0">${u.bio}</p>
+        <div class="profile-stats">
+          <div><b>${myPosts.length}</b>Posts</div><div><b>${u.followers}</b>Followers</div>
+          <div><b>${u.following}</b>Following</div><div><b>${state.campaigns.filter(c=>c.joined).length}</b>Campaigns</div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="app.editProfile()">Edit Profile</button>
+      <button class="btn btn-outline btn-sm" onclick="app.logout()">Log out</button>
+    </div>
+    <div class="section-title" style="margin-top:16px"><h3>Your Posts</h3></div>
+    ${myPosts.length ? myPosts.map((p,i)=>this.renderPost(p,i)).join('') : '<div class="card empty">You haven\'t posted yet — share your first update from Home.</div>'}`;
+  },
+  editProfile(){
+    const bio = prompt('Update your bio:', state.user.bio);
+    if(bio!==null){ state.user.bio = bio; save(); this.renderCenter('profile'); }
+  },
+
+  /* ---------- PUBLIC CONTENT PAGES ---------- */
+  viewAbout(){
+    return `<h2>About EcoConnect</h2>
+    <p style="color:var(--sub);font-size:16px;line-height:1.6">EcoConnect is a social networking platform designed to connect people who care about the environment and encourage them to share knowledge, discuss environmental problems, and participate in environmental activities. Whether you're a student, an activist, or just getting started, EcoConnect gives you a place to post, discuss, and act.</p>
+    <div class="card" style="margin-top:20px">
+      <h3 style="font-size:15px">Our mission</h3>
+      <p style="color:var(--sub);font-size:14px">Turn everyday awareness into local action by making it as easy to organize a clean-up or start a campaign as it is to post about one.</p>
+    </div>`;
+  },
+  viewNews(){
+    return `<div class="section-title"><h3>News & Updates</h3></div>
+    ${NEWS.map(n=>`<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div class="issue-icon" style="margin:0">${n.icon}</div>
+        <div><div style="font-size:12px;color:var(--sub)">${n.date}</div><h3 style="font-size:16px;margin:2px 0 4px">${n.title}</h3>
+        <p style="font-size:13px;color:var(--sub);margin:0">${n.excerpt}</p></div>
+      </div></div>`).join('')}`;
+  },
+  viewEvents(){
+    return `<div class="section-title"><h3>Upcoming Events</h3></div>
+    ${EVENTS.map((e,i)=>{ const rsvp = state.rsvp && state.rsvp[i];
+      return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div class="issue-icon" style="margin:0">${e.icon}</div>
+        <div style="flex:1"><h3 style="font-size:16px;margin:0 0 2px">${e.title}</h3>
+        <div style="font-size:12px;color:var(--sub)">${e.date} · ${e.loc}</div>
+        <p style="font-size:13px;color:var(--sub);margin:6px 0">${e.desc}</p>
+        <button class="btn btn-sm ${rsvp?'btn-outline':'btn-primary'}" onclick="app.rsvp(${i})">${rsvp?'✓ You\'re going':'RSVP'}</button></div>
+      </div></div>`; }).join('')}`;
+  },
+  rsvp(i){ state.rsvp = state.rsvp||{}; state.rsvp[i] = !state.rsvp[i]; save(); this.go('events'); },
+  viewGetInvolved(){
+    const donated = state.donated||0;
+    return `<div class="section-title"><h3>Get Involved</h3></div>
+    <div class="card" style="margin-bottom:14px">
+      <h3 style="font-size:15px">Volunteer</h3>
+      <p style="font-size:13px;color:var(--sub)">Join a local campaign or discussion group and put your time toward something concrete.</p>
+      <button class="btn btn-primary btn-sm" onclick="app.go('campaigns')">Browse Campaigns</button>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <h3 style="font-size:15px">Donate</h3>
+      <p style="font-size:13px;color:var(--sub)">Support clean-up drives, sapling drops, and community events. Total raised this month: <b>$${donated}</b></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${[10,25,50].map(a=>`<button class="btn btn-outline btn-sm" onclick="app.donate(${a})">$${a}</button>`).join('')}
+        <button class="btn btn-gold btn-sm" onclick="app.donate()">Custom amount</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px">Partner with us</h3>
+      <p style="font-size:13px;color:var(--sub)">Represent a school, business, or NGO? Reach out via the Contact page to co-host a campaign.</p>
+      <button class="btn btn-outline btn-sm" onclick="app.go('contact')">Contact Us</button>
+    </div>`;
+  },
+  donate(amount){
+    if(!amount){ const v = prompt('Enter donation amount ($):','20'); amount = parseInt(v); if(!amount) return; }
+    state.donated = (state.donated||0) + amount; save();
+    alert('Thank you for donating $'+amount+' to EcoConnect!');
+    this.go('getinvolved');
+  },
+  viewContact(){
+    return `<div class="section-title"><h3>Contact Us</h3></div>
+    <div class="card" style="margin-bottom:16px">
+      <label style="font-size:12px;color:var(--sub)">Name</label><input id="c-name" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);margin:4px 0 10px;background:transparent;color:var(--ink)">
+      <label style="font-size:12px;color:var(--sub)">Email</label><input id="c-email" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);margin:4px 0 10px;background:transparent;color:var(--ink)">
+      <label style="font-size:12px;color:var(--sub)">Message</label><textarea id="c-msg" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);margin:4px 0 10px;background:transparent;color:var(--ink);min-height:80px"></textarea>
+      <button class="btn btn-primary btn-sm" onclick="app.sendContact()">Send Message</button>
+    </div>
+    <div class="card" style="margin-bottom:16px;font-size:13px;color:var(--sub)">
+      📍 42 Green Street, Pune, India &nbsp;·&nbsp; ✉️ hello@ecoconnect.org &nbsp;·&nbsp; ☎ +91 98765 43210
+    </div>
+    <div class="section-title"><h3 style="font-size:15px">Frequently Asked Questions</h3></div>
+    ${FAQS.map((f,i)=>`<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="app.toggleFaq(${i})">
+      <b>${f.q}</b><div id="faq-${i}" class="hide" style="font-size:13px;color:var(--sub);margin-top:6px">${f.a}</div>
+    </div>`).join('')}`;
+  },
+  toggleFaq(i){ document.getElementById('faq-'+i).classList.toggle('hide'); },
+  sendContact(){
+    const n=document.getElementById('c-name').value.trim();
+    if(!n){ alert('Please enter your name.'); return; }
+    alert('Thanks '+n+'! Your message has been sent — we\'ll get back to you within 2 business days.');
+    this.go('contact');
+  },
+
+  /* ---------- NOTIFICATIONS ---------- */
+  viewNotifications(){
+    return `<div class="section-title"><h3>Notifications</h3></div>
+    <div class="card">${state.notifications.map(n=>`<div class="notif-item"><span>${n.icon}</span><span>${n.text}</span></div>`).join('')}</div>`;
+  },
+
+  /* ---------- SEARCH ---------- */
+  doSearch(term){
+    this.searchTerm = term;
+    if(!term){ if(this.currentView==='search') this.go('home'); return; }
+    if(!state.user){ return; }
+    this.go('search');
+  },
+  viewSearch(term){
+    const t = term.toLowerCase();
+    const users = SEED_USERS.filter(u=>u.name.toLowerCase().includes(t));
+    const posts = state.posts.filter(p=>p.text.toLowerCase().includes(t));
+    const issues = ISSUES.filter(i=>i.title.toLowerCase().includes(t));
+    const camps = state.campaigns.filter(c=>c.title.toLowerCase().includes(t));
+    const groups = state.groups.filter(g=>g.title.toLowerCase().includes(t));
+    const sec=(title,items)=> items.length? `<div class="section-title"><h3 style="font-size:15px">${title}</h3></div>` + items : '';
+    return `<h3>Results for "${term}"</h3>
+      ${sec('Users', users.map(u=>`<div class="card mini-row"><span>${u.name} — ${u.tag}</span></div>`).join(''))}
+      ${sec('Posts', posts.map((p,i)=>this.renderPost(p,i)).join(''))}
+      ${sec('Issues', issues.map(i=>`<div class="card mini-row" data-issue="${i.id}" style="cursor:pointer">${i.icon} ${i.title}</div>`).join(''))}
+      ${sec('Campaigns', camps.map(c=>`<div class="card mini-row">${c.icon} ${c.title}</div>`).join(''))}
+      ${sec('Communities', groups.map(g=>`<div class="card mini-row" data-group="${g.id}" style="cursor:pointer">${g.icon} ${g.title}</div>`).join(''))}
+      ${(!users.length&&!posts.length&&!issues.length&&!camps.length&&!groups.length)?'<div class="card empty">No results found.</div>':''}`;
+  },
+
+  /* ---------- RIGHT SIDEBAR ---------- */
+  renderRight(){
+    document.getElementById('trend-issues').innerHTML = ISSUES.slice(0,4).map(i=>`<div class="mini-row" data-issue="${i.id}" style="cursor:pointer">${i.icon} ${i.title}</div>`).join('');
+    document.getElementById('trend-camps').innerHTML = state.campaigns.slice(0,3).map(c=>`<div class="mini-row"><span>${c.icon} ${c.title}</span><button class="btn btn-sm ${c.joined?'btn-outline':'btn-gold'}" onclick="app.joinCampaign('${c.id}')">${c.joined?'Joined':'Join'}</button></div>`).join('');
+    document.getElementById('trend-users').innerHTML = SEED_USERS.map(u=>`<div class="mini-row"><span>${u.name}</span><button class="btn btn-sm ${state.following[u.id]?'btn-outline':'btn-primary'}" onclick="app.follow('${u.id}')">${state.following[u.id]?'Following':'Follow'}</button></div>`).join('');
+    this.bindDynamic();
+  },
+  follow(id){ state.following[id] = !state.following[id]; save(); this.renderRight(); }
+};
+
+/* nav bindings */
+document.querySelectorAll('#navlinks a').forEach(a=>a.onclick=(e)=>{e.preventDefault(); app.go(a.dataset.go);});
+document.querySelectorAll('#sidebar .item, #bottomnav .bn-item').forEach(el=>el.onclick=()=>app.go(el.dataset.go));
+document.getElementById('landing-issues').innerHTML = ISSUES.slice(0,4).map(i=>`
+  <div class="card" data-issue="${i.id}" style="cursor:pointer" onclick="if(!${!!state.user}){app.openAuth()}else{app.go('explore','${i.id}')}">
+    <div class="issue-icon">${i.icon}</div><h3 style="font-size:15px">${i.title}</h3></div>`).join('');
+
+/* boot */
+if(state.user){
+  document.getElementById('search-box').classList.remove('hide');
+  document.getElementById('notif-btn').classList.remove('hide');
+  document.getElementById('profile-btn').classList.remove('hide');
+  document.getElementById('login-nav-btn').classList.add('hide');
+  document.getElementById('bottomnav').classList.add('on');
+  app.go('home');
+} else {
+  app.go('landing');
+}
+app.renderRight();
+</script>
+</body>
+</html>
